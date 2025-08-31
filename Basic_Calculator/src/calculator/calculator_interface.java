@@ -6,25 +6,6 @@ import java.util.regex.*;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptEngine;
 
-/*THINGS LEFT TO DO
- * add function to all buttons
- * calculating system
- * 		when equal button is pressed, text from display is taken
- * 		gather into an arrayList
- * 		do the calculation (how? to be decided) but it follows PEMDAS
- * 
- * check system
- * 		when any of the button is pressed, run a special method to update: display area AND arrayList
- * 		when operation button is pressed run a checking: if last element on array list is !isDigit don't update anything
- * 		display an error message AND do not start calculation
- * 
- * undo button
- * 		check display, take the full text, remove last character, update the display, update the arrayList
- * 
- * 
- * EASIEST WAY TO MANAGE ARRAYLIST: EVERY UPDATE, EMPTY THE ARRAYLIST, UPDATE A NEW ARRAYLIST
- * */
-
 
 public class calculator_interface implements ActionListener{
 	
@@ -42,6 +23,7 @@ public class calculator_interface implements ActionListener{
 	Panel opPanel = new Panel();
 	Panel sidePanel = new Panel();
 	TextField display = new TextField();
+	ArrayList<String> expression = new ArrayList<>();
 	
 	
 	public static void main(String[] args)
@@ -62,7 +44,7 @@ public class calculator_interface implements ActionListener{
 		
 		//sub panel coloring (for discerning)
 		buttonPanel.setBackground(Color.RED);
-		textPanel.setBackground(Color.BLUE);
+		textPanel.setBackground(Color.white);
 		
 		//two sub panels sizing
 		textPanel.setPreferredSize(new Dimension(500,100)); //setPreferredSize for sizing
@@ -86,9 +68,9 @@ public class calculator_interface implements ActionListener{
 		sidePanel.setPreferredSize(new Dimension(100,400));
 		
 		//buttonPanel sub panel coloring (discerning)
-		numberPanel.setBackground(Color.CYAN);
-		opPanel.setBackground(Color.CYAN);
-		sidePanel.setBackground(Color.CYAN);
+		numberPanel.setBackground(Color.WHITE);
+		opPanel.setBackground(Color.GRAY);
+		sidePanel.setBackground(Color.GRAY);
 		
 		//set grid layout for all sub panels of buttonPanel
 		numberPanel.setLayout(new GridBagLayout());
@@ -132,7 +114,7 @@ public class calculator_interface implements ActionListener{
 		
 		operations[0] = new Button("+");
 		operations[1] = new Button("-");
-		operations[2] = new Button("x");
+		operations[2] = new Button("*");
 		operations[3] = new Button("/");
 		
 		for(int i = 0 ; i < 4 ; i++)
@@ -140,6 +122,7 @@ public class calculator_interface implements ActionListener{
 			operations[i].addActionListener(this);
 		}
 		
+		decimal.addActionListener(this);
 		
 		for(int i = 0; i < 4; i++)
 		{
@@ -163,6 +146,11 @@ public class calculator_interface implements ActionListener{
 		c.gridy = 1;
 		c.ipady = 300;
 		sidePanel.add(others[2], c);
+		
+		for(int i = 0; i < 3; i++)
+		{
+			others[i].addActionListener(this);
+		}
 		
 		
 		
@@ -210,6 +198,22 @@ public class calculator_interface implements ActionListener{
 			
 		}
 		
+		if(e.getSource() == decimal)
+		{
+			
+			if(calc.lastCharCheck(display.getText()))
+			{
+				String currentText = display.getText();
+				System.out.println("PRINTING: " + currentText);
+				String update = e.getActionCommand();
+				System.out.println("OPERATION TYPED: " + update);
+				
+				String updated = calc.editDisplay(currentText, update);
+				display.setText(updated);
+			}
+			
+		}
+		
 		for(int i = 0 ; i < 4; i++)
 		{
 			if(e.getSource() == operations[i])
@@ -224,6 +228,54 @@ public class calculator_interface implements ActionListener{
 					String updated = calc.editDisplay(currentText, update);
 					display.setText(updated);
 				}
+			}
+		}
+		
+		if(e.getSource() == others[2])
+		{
+			if(calc.lastCharCheck(display.getText()))
+			{
+				String currentText = display.getText();
+				System.out.println("CURRENT EXPRESSION: " + currentText);
+				expression = calc.splitter(currentText);
+				System.out.println("CALCULATION IN PROCESS");
+				System.out.println("THE ARRAYLIST: " + expression);
+				
+				double result = calc.PEMDAS(expression); //WE HAVE A PROBLEM HERE
+				String update = String.valueOf(result);
+				System.out.println("RESULT: " + result);
+				display.setText(update);
+				
+			}
+		}
+		
+		if(e.getSource() == others[1])
+		{
+			if(!(display.getText().equals("")))
+			{
+				String currentText = display.getText();
+				String update = calc.undoDisplay(currentText);
+				display.setText(update);
+				System.out.println("Undo result: " + update);
+			}
+			else
+			{
+				System.out.println("DISPLAY IS EMPTY!");
+			}
+			
+			
+		}
+		
+		if(e.getSource() == others[0])
+		{
+			if(!(display.getText().equals("")))
+			{
+				display.setText(null);
+				System.out.println("CLEARED!");
+			}
+			else
+			{
+				System.out.println("DISPLAY ALREADY EMPTY");
 			}
 		}
 		
