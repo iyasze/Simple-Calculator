@@ -3,8 +3,7 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
+
 
 
 public class calculator_interface implements ActionListener{
@@ -30,10 +29,10 @@ public class calculator_interface implements ActionListener{
 	{
 		calculator_interface obj = new calculator_interface();
 		
-		obj.mainFrame();
+		obj.initGUI();
 	}
 	
-	public void mainFrame()
+	public void initGUI()
 	{
 				
 		calcFrame.setSize(500,500);
@@ -47,7 +46,7 @@ public class calculator_interface implements ActionListener{
 		textPanel.setBackground(Color.white);
 		
 		//two sub panels sizing
-		textPanel.setPreferredSize(new Dimension(500,100)); //setPreferredSize for sizing
+		textPanel.setPreferredSize(new Dimension(500,100)); 
 		textPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		buttonPanel.setPreferredSize(new Dimension(500,400));
 		buttonPanel.setLayout(new BorderLayout());
@@ -106,7 +105,6 @@ public class calculator_interface implements ActionListener{
 		c.gridx = 2;
 		c.gridy = 3;
 		numberPanel.add(decimal, c);
-		//add numbers to the panel
 		
 		//add operation buttons
 		
@@ -154,13 +152,16 @@ public class calculator_interface implements ActionListener{
 		
 		
 		
-		
-		
-		
-		
-		calcFrame.add(mainPanel);
-		
+		calcFrame.add(mainPanel);	
 		calcFrame.setVisible(true);
+		
+		//allow program to automatically receive focus from keyboard
+		calcFrame.setFocusable(true);
+		calcFrame.requestFocus();
+		textPanel.setFocusable(true);
+		textPanel.requestFocus();
+		display.setFocusable(true);
+		display.requestFocusInWindow();
 		
 		
 		calcFrame.addWindowListener(new WindowAdapter() {
@@ -171,7 +172,7 @@ public class calculator_interface implements ActionListener{
 			}
 			
 			
-		}); //important as it can terminate the whole program when terminating the window
+		}); 
 		
 	}
 
@@ -179,9 +180,49 @@ public class calculator_interface implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		
+		//Class to allow calculation
 		calculation calc = new calculation();
 		
-		//number buttons
+			
+		//KEY BINDING FOR NUMBERS		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+				new KeyEventDispatcher() {
+					public boolean dispatchKeyEvent(KeyEvent x)
+					{
+						if(x.getID() == KeyEvent.KEY_PRESSED)
+						{
+							if(x.getKeyCode() >= KeyEvent.VK_0 && x.getKeyCode() <= KeyEvent.VK_9)
+							{
+								String digit = String.valueOf(x.getKeyChar());
+								
+								int index = digit.charAt(0) - '0';
+								
+								ActionEvent dummyEvent = new ActionEvent(numbers[index], ActionEvent.ACTION_PERFORMED, digit);
+								
+								numberAction(dummyEvent, calc);
+								return true;
+							}
+				
+						}	
+						
+						return false;
+					}
+				});
+
+		
+		//Actions performed for all buttons
+		numberAction(e, calc);
+		operationAction(e, calc);
+		decimalAction(e, calc);
+		equalAction(e, calc);
+		undoAction(e, calc);
+		clearAction(e, calc);
+		
+	}
+	
+	
+	public void numberAction(ActionEvent e, calculation calc )
+	{
 		for(int i = 0 ; i < 10 ; i++)
 		{
 			if(e.getSource() == numbers[i])
@@ -197,58 +238,10 @@ public class calculator_interface implements ActionListener{
 			}
 			
 		}
-		
-		if(e.getSource() == decimal)
-		{
-			
-			if(calc.lastCharCheck(display.getText()))
-			{
-				String currentText = display.getText();
-				System.out.println("PRINTING: " + currentText);
-				String update = e.getActionCommand();
-				System.out.println("OPERATION TYPED: " + update);
-				
-				String updated = calc.editDisplay(currentText, update);
-				display.setText(updated);
-			}
-			
-		}
-		
-		for(int i = 0 ; i < 4; i++)
-		{
-			if(e.getSource() == operations[i])
-			{
-				if(calc.lastCharCheck(display.getText()))
-				{
-					String currentText = display.getText();
-					System.out.println("PRINTING: " + currentText);
-					String update = e.getActionCommand();
-					System.out.println("OPERATION TYPED: " + update);
-					
-					String updated = calc.editDisplay(currentText, update);
-					display.setText(updated);
-				}
-			}
-		}
-		
-		if(e.getSource() == others[2])
-		{
-			if(calc.lastCharCheck(display.getText()))
-			{
-				String currentText = display.getText();
-				System.out.println("CURRENT EXPRESSION: " + currentText);
-				expression = calc.splitter(currentText);
-				System.out.println("CALCULATION IN PROCESS");
-				System.out.println("THE ARRAYLIST: " + expression);
-				
-				double result = calc.PEMDAS(expression); //WE HAVE A PROBLEM HERE
-				String update = String.valueOf(result);
-				System.out.println("RESULT: " + result);
-				display.setText(update);
-				
-			}
-		}
-		
+	}
+	
+	public void undoAction(ActionEvent e, calculation calc)
+	{
 		if(e.getSource() == others[1])
 		{
 			if(!(display.getText().equals("")))
@@ -265,7 +258,70 @@ public class calculator_interface implements ActionListener{
 			
 			
 		}
-		
+	}
+	
+	public void decimalAction(ActionEvent e, calculation calc) 
+	{
+		if(e.getSource() == decimal)
+		{
+			
+			if(calc.lastCharCheck(display.getText()))
+			{
+				String currentText = display.getText();
+				System.out.println("PRINTING: " + currentText);
+				String update = e.getActionCommand();
+				System.out.println("OPERATION TYPED: " + update);
+				
+				String updated = calc.editDisplay(currentText, update);
+				display.setText(updated);
+			}
+			
+		}
+	}
+	
+	public void equalAction(ActionEvent e, calculation calc) 
+	{
+		if(e.getSource() == others[2])
+		{
+			if(calc.lastCharCheck(display.getText()))
+			{
+				String currentText = display.getText();
+				System.out.println("CURRENT EXPRESSION: " + currentText);
+				expression = calc.splitter(currentText);
+				System.out.println("CALCULATION IN PROCESS");
+				System.out.println("THE ARRAYLIST: " + expression);
+				
+				double result = calc.PEMDAS(expression); 
+				String update = String.valueOf(result);
+				System.out.println("RESULT: " + result);
+				display.setText(update);
+				
+			}
+		}
+	}
+	
+	public void operationAction(ActionEvent e, calculation calc) 
+	{
+		for(int i = 0 ; i < 4; i++)
+		{
+			if(e.getSource() == operations[i])
+			{
+				if(calc.lastCharCheck(display.getText()))
+				{
+					String currentText = display.getText();
+					System.out.println("PRINTING: " + currentText);
+					String update = e.getActionCommand();
+					System.out.println("OPERATION TYPED: " + update);
+					
+					String updated = calc.editDisplay(currentText, update);
+					display.setText(updated);
+				}
+			}
+		}
+	}
+	
+	public void clearAction(ActionEvent e, calculation calc)
+	{
 		if(e.getSource() == others[0])
 		{
 			if(!(display.getText().equals("")))
@@ -278,8 +334,6 @@ public class calculator_interface implements ActionListener{
 				System.out.println("DISPLAY ALREADY EMPTY");
 			}
 		}
-		
-		
 	}
 	
 }
