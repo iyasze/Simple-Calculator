@@ -2,6 +2,7 @@ package calculator;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 import java.util.regex.*;
 
 
@@ -292,14 +293,25 @@ public class calculator_interface implements ActionListener{
 		{
 			if(calc.lastCharCheck(display.getText()))
 			{
+				String update;
 				String currentText = display.getText();
 				System.out.println("CURRENT EXPRESSION: " + currentText);
 				expression = calc.splitter(currentText);
 				System.out.println("CALCULATION IN PROCESS");
 				System.out.println("THE ARRAYLIST: " + expression);
 				
-				double result = calc.PEMDAS(expression); 
-				String update = String.valueOf(result);
+				double result = calc.PEMDAS(expression);				
+				
+				if(result == (int) result)
+				{
+					update = String.valueOf((int)result);
+				}
+				else
+				{
+					update = String.valueOf(result);
+				}
+				
+				
 				System.out.println("RESULT: " + result);
 				answer.setText(update);
 				
@@ -331,7 +343,7 @@ public class calculator_interface implements ActionListener{
 	{
 		if(e.getSource() == others[0])
 		{
-			if(!(display.getText().equals("")) && !(answer.getText().equals("")))
+			if(!(display.getText().equals("")) || !(answer.getText().equals("")))
 			{
 				display.setText(null);
 				answer.setText(null);
