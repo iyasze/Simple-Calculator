@@ -22,6 +22,9 @@ public class calculator_interface implements ActionListener{
 	Panel opPanel = new Panel();
 	Panel sidePanel = new Panel();
 	TextField display = new TextField();
+	TextField answer = new TextField();
+	Font font = new Font("Time", Font.BOLD, 12);
+	Font font2 = new Font("Time", Font.BOLD, 18);
 	ArrayList<String> expression = new ArrayList<>();
 	
 	
@@ -36,14 +39,14 @@ public class calculator_interface implements ActionListener{
 	{
 				
 		calcFrame.setSize(500,500);
+		display.setFont(font);
+		answer.setFont(font2);
+		
 		
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.add(buttonPanel, BorderLayout.CENTER);
 		mainPanel.add(textPanel, BorderLayout.NORTH);
-		
-		//sub panel coloring (for discerning)
-		buttonPanel.setBackground(Color.RED);
-		textPanel.setBackground(Color.white);
+	
 		
 		//two sub panels sizing
 		textPanel.setPreferredSize(new Dimension(500,100)); 
@@ -55,8 +58,12 @@ public class calculator_interface implements ActionListener{
 		//adding textField to textPanel
 		
 		display.setEditable(false);
-		display.setPreferredSize(new Dimension(480, 90));
+		display.setPreferredSize(new Dimension(480, 30));
 		textPanel.add(display);
+		
+		answer.setEditable(false);
+		answer.setPreferredSize(new Dimension(480, 50));
+		textPanel.add(answer);
 		
 		//adding subPanels to buttonPanel
 		buttonPanel.add(numberPanel, BorderLayout.WEST);
@@ -294,7 +301,7 @@ public class calculator_interface implements ActionListener{
 				double result = calc.PEMDAS(expression); 
 				String update = String.valueOf(result);
 				System.out.println("RESULT: " + result);
-				display.setText(update);
+				answer.setText(update);
 				
 			}
 		}
@@ -324,9 +331,10 @@ public class calculator_interface implements ActionListener{
 	{
 		if(e.getSource() == others[0])
 		{
-			if(!(display.getText().equals("")))
+			if(!(display.getText().equals("")) && !(answer.getText().equals("")))
 			{
 				display.setText(null);
+				answer.setText(null);
 				System.out.println("CLEARED!");
 			}
 			else
