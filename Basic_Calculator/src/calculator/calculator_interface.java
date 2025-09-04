@@ -2,10 +2,6 @@ package calculator;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.DecimalFormat;
-import java.util.regex.*;
-
-
 
 public class calculator_interface implements ActionListener{
 	
@@ -27,12 +23,12 @@ public class calculator_interface implements ActionListener{
 	Font font = new Font("Time", Font.BOLD, 12);
 	Font font2 = new Font("Time", Font.BOLD, 18);
 	ArrayList<String> expression = new ArrayList<>();
-	
-	
+
+
 	public static void main(String[] args)
 	{
 		calculator_interface obj = new calculator_interface();
-		
+
 		obj.initGUI();
 	}
 	
@@ -194,27 +190,24 @@ public class calculator_interface implements ActionListener{
 			
 		//KEY BINDING FOR NUMBERS		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-				new KeyEventDispatcher() {
-					public boolean dispatchKeyEvent(KeyEvent x)
+				x -> { //use lambda because when addKeyEventDispatcher, x is KeyEvent
+					if(x.getID() == KeyEvent.KEY_PRESSED)
 					{
-						if(x.getID() == KeyEvent.KEY_PRESSED)
+						if(x.getKeyCode() >= KeyEvent.VK_0 && x.getKeyCode() <= KeyEvent.VK_9)
 						{
-							if(x.getKeyCode() >= KeyEvent.VK_0 && x.getKeyCode() <= KeyEvent.VK_9)
-							{
-								String digit = String.valueOf(x.getKeyChar());
-								
-								int index = digit.charAt(0) - '0';
-								
-								ActionEvent dummyEvent = new ActionEvent(numbers[index], ActionEvent.ACTION_PERFORMED, digit);
-								
-								numberAction(dummyEvent, calc);
-								return true;
-							}
-				
-						}	
-						
-						return false;
+							String digit = String.valueOf(x.getKeyChar());
+
+							int index = digit.charAt(0) - '0';
+
+							ActionEvent dummyEvent = new ActionEvent(numbers[index], ActionEvent.ACTION_PERFORMED, digit);
+
+							numberAction(dummyEvent, calc);
+							return true;
+						}
+
 					}
+					return false;
+
 				});
 
 		
@@ -224,7 +217,7 @@ public class calculator_interface implements ActionListener{
 		decimalAction(e, calc);
 		equalAction(e, calc);
 		undoAction(e, calc);
-		clearAction(e, calc);
+		clearAction(e);
 		
 	}
 	
@@ -252,7 +245,7 @@ public class calculator_interface implements ActionListener{
 	{
 		if(e.getSource() == others[1])
 		{
-			if(!(display.getText().equals("")))
+			if(!(display.getText().isEmpty()))
 			{
 				String currentText = display.getText();
 				String update = calc.undoDisplay(currentText);
@@ -339,11 +332,11 @@ public class calculator_interface implements ActionListener{
 		}
 	}
 	
-	public void clearAction(ActionEvent e, calculation calc)
+	public void clearAction(ActionEvent e)
 	{
 		if(e.getSource() == others[0])
 		{
-			if(!(display.getText().equals("")) || !(answer.getText().equals("")))
+			if(!(display.getText().isEmpty()) || !(answer.getText().isEmpty()))
 			{
 				display.setText(null);
 				answer.setText(null);
